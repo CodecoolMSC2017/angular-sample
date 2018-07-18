@@ -13,6 +13,7 @@ export class RegisterService {
   register(registerDetails: RegisterDetails): Observable<void> {
     return this.http.post<void>('/api/register', {
       username: registerDetails.username,
+      email: registerDetails.email,
       password: registerDetails.password,
       confirmationPassword: registerDetails.confirmationPassword
     });
