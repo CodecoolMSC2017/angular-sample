@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { UserService } from '../user.service';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 
 import { NewUser } from '../new-user';
 import { PasswordChange } from '../password-change';
@@ -13,7 +14,8 @@ import { User } from '../user';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  user = JSON.parse(sessionStorage.getItem('user'));
+
+  user: User;
   users: User[] = [];
   passwordChange: PasswordChange = new PasswordChange();
   newUser: NewUser = new NewUser();
@@ -24,14 +26,13 @@ export class DashboardComponent implements OnInit {
     private router: Router) { }
 
   ngOnInit() {
+    this.authService.getAuth().subscribe(user => this.user = user);
   }
 
   deleteAuth() {
-    const clearAuth = () => {
-      sessionStorage.clear();
-      this.router.navigate(['login']);
-    };
-    this.authService.deleteAuth().subscribe(clearAuth, clearAuth);
+    this.authService.deleteAuth()
+      .pipe(finalize(() => this.router.navigate(['login'])))
+      .subscribe();
   }
 
   getUsers() {
